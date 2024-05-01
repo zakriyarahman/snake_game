@@ -16,19 +16,19 @@ init().then(_ => {
     canvas.width = worldWidth * CELL_SIZE;
 
     document.addEventListener("keydown", event => {
-        switch (event.key) {
-            case 'ArrowUp':
-                world.change_snake_dir(Direction.Up);
-                break;
-            case 'ArrowRight':
-                world.change_snake_dir(Direction.Right);
-                break;
-            case 'ArrowDown':
-                world.change_snake_dir(Direction.Down);
-                break;
-            case 'ArrowLeft':
-                world.change_snake_dir(Direction.Left);
-                break;
+        switch(event.code) {
+        case "ArrowUp":
+            world.change_snake_dir(Direction.Up);
+            break;
+        case "ArrowRight":
+            world.change_snake_dir(Direction.Right);
+            break;
+        case "ArrowDown":
+            world.change_snake_dir(Direction.Down);
+            break;
+        case "ArrowLeft":
+            world.change_snake_dir(Direction.Left);
+            break;
         }
     });
 
@@ -39,6 +39,7 @@ init().then(_ => {
             ctx.moveTo(CELL_SIZE * x, 0);
             ctx.lineTo(CELL_SIZE * x, worldWidth * CELL_SIZE);
         }
+
         for (let y = 0; y < worldWidth + 1; y++) {
             ctx.moveTo(0, CELL_SIZE * y);
             ctx.lineTo(worldWidth * CELL_SIZE, CELL_SIZE * y);
