@@ -11,3 +11,6 @@ wee_alloc = "0.4.5"
 
 [lib]
 crate-type = ["cdylib"]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
