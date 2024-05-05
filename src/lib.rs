@@ -88,13 +88,41 @@ impl World {
 
     fn gen_next_snake_head(&self) -> SnakeCell {
         let snake_idx = self.snake_head_idx();
-        let row = snake_idx / self.width();
+        let row = snake_idx / self.width;
 
         return match self.snake.direction {
-            Direction::Right => SnakeCell((row * self.width()) + (snake_idx + 1) % self.width()),
-            Direction::Left => SnakeCell((row * self.width()) + (snake_idx - 1) % self.width()),
-            Direction::Up => SnakeCell((snake_idx - self.width()) % self.size()),
-            Direction::Down => SnakeCell((snake_idx + self.width()) % self.size()),
+            Direction::Right => {
+                let threshold = (row + 1) * self.width;
+                if snake_idx + 1 == threshold {
+                    SnakeCell(threshold - self.width)
+                } else {
+                    SnakeCell(snake_idx + 1)
+                }
+            },
+            Direction::Left => {
+                let threshold = row * self.width;
+                if snake_idx == threshold {
+                    SnakeCell(threshold + (self.width - 1))
+                } else {
+                    SnakeCell(snake_idx - 1)
+                }
+            },
+            Direction::Up => {
+                let threshold = snake_idx - (row * self.width);
+                if snake_idx == threshold {
+                    SnakeCell((self.size - self.width) + threshold)
+                } else {
+                    SnakeCell(snake_idx - self.width)
+                }
+            },
+            Direction::Down => {
+                let threshold = snake_idx + ((self.width - row) * self.width);
+                if snake_idx + self.width == threshold {
+                    SnakeCell(threshold - ((row + 1) * self.width))
+                } else {
+                    SnakeCell(snake_idx + self.width)
+                }
+            },
         };
     }
 }
