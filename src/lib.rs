@@ -97,6 +97,10 @@ impl World {
         self.reward_cell
     }
 
+    pub fn start_game (&mut self) {
+        self.status = Some(GameStatus::Played);
+    }
+
     pub fn snake_head_idx(&self) -> usize {
         self.snake.body[0].0
     }
@@ -134,7 +138,7 @@ impl World {
                     Some(cell) => {
                         self.snake.body[0] = cell;
                         self.next_cell = None;
-                    }
+                    },
                     None => {
                         self.snake.body[0] = self.gen_next_snake_cell(&self.snake.direction);
                     },
@@ -197,6 +201,7 @@ impl World {
             },
         };
     }
+
 }
 
 // wasm-pack build --target web
