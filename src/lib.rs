@@ -18,6 +18,13 @@ pub enum Direction {
     Right
 }
 
+#[wasm_bindgen]
+pub enum GameStatus {
+    Won,
+    Lost,
+    Played,
+}
+
 #[derive(Clone, Copy, PartialEq)]
 pub struct SnakeCell(usize);
 
@@ -47,6 +54,7 @@ pub struct World {
     snake: Snake,
     next_cell: Option<SnakeCell>,
     reward_cell: usize,
+    status: Option<GameStatus>,
 }
 
 #[wasm_bindgen]
@@ -62,6 +70,7 @@ impl World {
             reward_cell: World::gen_reward_cell(size, &snake.body),
             snake,
             next_cell: None,
+            status: None,
         }
     }
 
@@ -117,30 +126,35 @@ impl World {
     // }
 
     pub fn step(&mut self) {
-        let temp = self.snake.body.clone();
+        match self.status {
+            Some(GameStatus::Played) => {
+                let temp = self.snake.body.clone();
 
-        match self.next_cell {
-            Some(cell) => {
-                self.snake.body[0] = cell;
-                self.next_cell = None;
-            }
-            None => {
-                self.snake.body[0] = self.gen_next_snake_cell(&self.snake.direction);
+                match self.next_cell {
+                    Some(cell) => {
+                        self.snake.body[0] = cell;
+                        self.next_cell = None;
+                    }
+                    None => {
+                        self.snake.body[0] = self.gen_next_snake_cell(&self.snake.direction);
+                    },
+                }
+
+                let len = self.snake.body.len();
+                for i in 1..len {
+                    self.snake.body[i] = SnakeCell(temp[i - 1].0);
+                }
+
+                if self.reward_cell == self.snake_head_idx() {
+                    if self.snake_length() < self.size {
+                        self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body);
+                    } else {
+                        self.reward_cell = 1000;
+                    }
+                    self.snake.body.push(SnakeCell(self.snake.body[1].0));
+                }
             },
-        }
-
-        let len = self.snake.body.len();
-        for i in 1..len {
-            self.snake.body[i] = SnakeCell(temp[i - 1].0);
-        }
-
-        if self.reward_cell == self.snake_head_idx() {
-            if self.snake_length() < self.size {
-                self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body);
-            } else {
-                self.reward_cell = 1000;
-            }
-            self.snake.body.push(SnakeCell(self.snake.body[1].0));
+            _ => {}
         }
     }
 
