@@ -89,7 +89,9 @@ init().then(wasm => {
             world.snake_length()
         );
 
-        snakeCells.forEach((cellIdx, i) => {
+        snakeCells
+        .filter((cellIdx, i) => !(i > 0 && cellIdx === snakeCells[0]))
+        .forEach((cellIdx, i) => {
             const col = cellIdx % worldWidth;
             const row = Math.floor(cellIdx / worldWidth);
 
