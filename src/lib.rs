@@ -19,6 +19,7 @@ pub enum Direction {
 }
 
 #[wasm_bindgen]
+#[derive(Clone, Copy)]
 pub enum GameStatus {
     Won,
     Lost,
@@ -101,6 +102,19 @@ impl World {
         self.status = Some(GameStatus::Played);
     }
 
+    pub fn game_status(&self) -> Option<GameStatus> {
+        self.status
+    }
+
+    pub fn game_status_text(&self) -> String {
+        match self.game_status() {
+            Some(GameStatus::Won) => String::from("You have won!"),
+            Some(GameStatus::Lost) => String::from("You have lost!"),
+            Some(GameStatus::Played) => String::from("Playing"),
+            None => String::from("No Status"),
+        }
+    }
+
     pub fn snake_head_idx(&self) -> usize {
         self.snake.body[0].0
     }
@@ -144,9 +158,12 @@ impl World {
                     },
                 }
 
-                let len = self.snake.body.len();
-                for i in 1..len {
+                for i in 1..self.snake_length() {
                     self.snake.body[i] = SnakeCell(temp[i - 1].0);
+                }
+
+                if self.snake.body[1..self.snake_length()].contains(&self.snake.body[0]) {
+                    self.status = Some(GameStatus::Lost);
                 }
 
                 if self.reward_cell == self.snake_head_idx() {
@@ -154,6 +171,7 @@ impl World {
                         self.reward_cell = World::gen_reward_cell(self.size, &self.snake.body);
                     } else {
                         self.reward_cell = 1000;
+                        self.status = Some(GameStatus::Won);
                     }
                     self.snake.body.push(SnakeCell(self.snake.body[1].0));
                 }
